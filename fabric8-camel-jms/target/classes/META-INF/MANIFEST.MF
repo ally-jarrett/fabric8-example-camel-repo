@@ -9,7 +9,7 @@ Build-Jdk: 1.7.0_55
 Bundle-Version: 1.0.0.SNAPSHOT
 Tool: Bnd-1.43.0
 Bundle-Name: fabric8-camel-jms
-Bnd-LastModified: 1404385069828
+Bnd-LastModified: 1404386051323
 Created-By: Apache Maven Bundle Plugin
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.fabric8.camel.fabric8-camel-jms
