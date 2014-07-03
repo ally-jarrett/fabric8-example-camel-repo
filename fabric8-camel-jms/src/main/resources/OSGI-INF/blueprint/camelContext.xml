@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:camel="http://camel.apache.org/schema/blueprint" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+	<camelContext id="camel-jms-transactions" trace="false"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+		<onException>
+			<exception>org.fabric8.demo.exceptions.ServiceInvocationException</exception>
+			<handled>
+				<constant>true</constant>
+			</handled>
+			<log message="ServiceInvocationException Thrown" logName="serviceInvocationException" />
+			<to uri="activemq:service-error" />
+		</onException>
+		
+		<onException>
+			<exception>java.lang.Exception</exception>
+			<log message="Fatal Exception Thrown, rolling back transaction" logName="fatalExceptionLog" />
+		</onException>
+
+		<route id="camel-jms-transaction-test">
+			<from uri="activemq:jms-queue-in" />
+			<transacted ref="transactionPolicy" />
+			<bean ref="StubService1" />
+			<log message="Route Logger Fired!" logName="camelJmsLog" />
+			<to uri="ErrorProcessor" />
+			<to uri="activemq:jms-queue-out" />
+		</route>
+		
+	</camelContext>
+
+	<!-- ############# BEANS ############# -->
+
+	<bean id="StubService1" class="org.fabric8.demo.transactions.Service1Stub" />
+	
+	<!-- ############# PROCESSORS ############# -->
+	
+	<bean id="ErrorProcessor" class="org.fabric8.demo.processors.ErrorProcessor" />
+
+	<!-- ############# AMQ CONFIG ############# -->
+
+	<bean id="transactionPolicy" class="org.apache.camel.spring.spi.SpringTransactionPolicy">
+		<property name="transactionManager" ref="jmsTransactionManager" />
+		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRES_NEW" />
+	</bean>
+
+	<bean id="jmsTransactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="pooledConnectionFactory" />
+	</bean>
+
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://localhost:61616" />
+		<property name="userName" value="admin" />
+		<property name="password" value="admin" />
+		<property name="watchTopicAdvisories" value="false" />
+		<property name="redeliveryPolicy" ref="amqRediveryPolicy" />
+	</bean>
+
+	<bean id="amqRediveryPolicy" class="org.apache.activemq.RedeliveryPolicy">
+		<property name="backOffMultiplier" value="1" />
+		<property name="initialRedeliveryDelay" value="1000" />
+		<property name="maximumRedeliveries" value="2" />
+		<property name="redeliveryDelay" value="1000" />
+		<property name="useExponentialBackOff" value="true" />
+	</bean>
+
+	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+		init-method="start" destroy-method="stop">
+		<property name="maxConnections" value="8" />
+		<property name="connectionFactory" ref="jmsConnectionFactory" />
+	</bean>
+
+	<bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+		<property name="connectionFactory" ref="pooledConnectionFactory" />
+		<property name="concurrentConsumers" value="8" />
+	</bean>
+
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="configuration">
+			<bean class="org.apache.camel.component.jms.JmsConfiguration">
+				<property name="connectionFactory" ref="pooledConnectionFactory" />
+				<property name="transactionManager" ref="jmsTransactionManager" />
+				<property name="transacted" value="true" />
+				<property name="cacheLevelName" value="CACHE_CONSUMER" />
+			</bean>
+		</property>
+	</bean>
+
+</blueprint>

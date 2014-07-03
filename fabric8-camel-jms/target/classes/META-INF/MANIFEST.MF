@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Export-Package: org.fabric8.demo.exceptions;version="1.0.0.SNAPSHOT",o
+ rg.fabric8.demo.processors;uses:="org.fabric8.demo.exceptions,org.apa
+ che.camel,org.slf4j,org.apache.commons.lang";version="1.0.0.SNAPSHOT"
+ ,org.fabric8.demo.transactions;uses:="org.fabric8.demo.exceptions,org
+ .slf4j";version="1.0.0.SNAPSHOT"
+Built-By: ajarrett
+Build-Jdk: 1.7.0_55
+Bundle-Version: 1.0.0.SNAPSHOT
+Tool: Bnd-1.43.0
+Bundle-Name: fabric8-camel-jms
+Bnd-LastModified: 1404385069828
+Created-By: Apache Maven Bundle Plugin
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.fabric8.camel.fabric8-camel-jms
+Import-Package: org.apache.activemq,org.apache.activemq.camel.componen
+ t;version="[5.9,6)",org.apache.activemq.pool,org.apache.camel;version
+ ="[2.12,3)",org.apache.camel.component.jms;version="[2.12,3)",org.apa
+ che.camel.spring.spi;version="[2.12,3)",org.apache.commons.lang;versi
+ on="[2.6,3)",org.osgi.service.blueprint;version="[1.0.0,2.0.0)",org.s
+ lf4j;version="[1.6,2)",org.springframework.jms.connection
+

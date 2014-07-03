@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features name="fabric-camel-features" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+	
+	<feature version="1.0.0-SNAPSHOT" name="fabric8-camel-jms">
+		<feature>mq-fabric-camel</feature>
+		<bundle>mvn:org.fabric8.camel/fabric8-camel-jms/1.0.0-SNAPSHOT</bundle>
+	</feature>
+	
+</features>
